@@ -1,6 +1,5 @@
 using System.Reactive.Concurrency;
 using ServiceLib.Services;
-using Avalonia.Threading;
 using System.Threading.Tasks;
 using System;
 
@@ -70,7 +69,7 @@ public class MainWindowViewModel : MyReactiveObject
     [Reactive] public bool BlIsWindows { get; set; }
 
     // ============================================
-    // اضافه شدن دکمه تست خودکار 
+    // اضافه شدن دکمه تست خودکار با استفاده از RxSchedulers
     // ============================================
     private bool _isAutoTestEnabled;
     public bool IsAutoTestEnabled
@@ -82,7 +81,7 @@ public class MainWindowViewModel : MyReactiveObject
             
             AutoTestManager.Instance.ToggleAutoTest(value, () => 
             {
-                Avalonia.Threading.Dispatcher.UIThread.Post(() => 
+                RxSchedulers.MainThreadScheduler.Schedule(() => 
                 {
                     _ = Reload(); 
                 });
