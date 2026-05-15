@@ -24,18 +24,18 @@
         <DockPanel>
             <DockPanel Margin="{StaticResource Margin8}" DockPanel.Dock="Top">
                 
-                <ContentControl x:Name="conTheme" DockPanel.Dock="Right" />
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Spacing="15" VerticalAlignment="Center">
+                    <ToggleButton 
+                        IsChecked="{Binding IsAutoTestEnabled}" 
+                        Content="🚀 اتصال هوشمند" 
+                        Background="#28a745"
+                        Foreground="White"
+                        CornerRadius="5"
+                        Padding="10,5"
+                        ToolTip.Tip="تست خودکار کانفیگ‌ها و اتصال به سریع‌ترین سرور هر ۶۰ ثانیه"/>
+                    <ContentControl x:Name="conTheme" />
+                </StackPanel>
                 
-                <ToggleButton 
-                    DockPanel.Dock="Right"
-                    IsChecked="{Binding IsAutoTestEnabled}" 
-                    Content="🚀 اتصال هوشمند" 
-                    Margin="5,0,15,0"
-                    Padding="8,4"
-                    Background="#28a745"
-                    Foreground="White"
-                    ToolTip.Tip="تست خودکار کانفیگ‌ها و اتصال به سریع‌ترین سرور هر ۶۰ ثانیه"/>
-                    
                 <Menu Margin="{StaticResource Margin4}">
                     <MenuItem Header="{x:Static resx:ResUI.menuServers}">
                         <MenuItem
