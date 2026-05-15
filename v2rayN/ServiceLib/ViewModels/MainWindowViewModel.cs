@@ -1,9 +1,38 @@
-using System.Reactive.Concurrency;
-using ServiceLib.Services;
-using System.Threading.Tasks;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Reactive.Concurrency;
 
 namespace ServiceLib.ViewModels;
+
+// =========================================================================
+// کلاس مدیریت تست خودکار (به داخل این فایل منتقل شد تا ارور بیلد برطرف شود)
+// =========================================================================
+public class AutoTestManager
+{
+    private static AutoTestManager? _instance;
+    public static AutoTestManager Instance => _instance ??= new AutoTestManager();
+
+    private bool _isAutoTestEnabled = false;
+    private Timer? _testTimer;
+
+    private AutoTestManager() { }
+
+    public void ToggleAutoTest(bool isEnabled, Action onTrigger)
+    {
+        _isAutoTestEnabled = isEnabled;
+        if (_isAutoTestEnabled)
+        {
+            // اجرای تست هر 60 ثانیه (60000 میلی‌ثانیه)
+            _testTimer = new Timer((e) => onTrigger?.Invoke(), null, 0, 60000);
+        }
+        else
+        {
+            _testTimer?.Dispose();
+        }
+    }
+}
+// =========================================================================
 
 public class MainWindowViewModel : MyReactiveObject
 {
@@ -69,7 +98,7 @@ public class MainWindowViewModel : MyReactiveObject
     [Reactive] public bool BlIsWindows { get; set; }
 
     // ============================================
-    // اضافه شدن دکمه تست خودکار با استفاده از RxSchedulers
+    // اضافه شدن دکمه تست خودکار 
     // ============================================
     private bool _isAutoTestEnabled;
     public bool IsAutoTestEnabled
@@ -81,9 +110,16 @@ public class MainWindowViewModel : MyReactiveObject
             
             AutoTestManager.Instance.ToggleAutoTest(value, () => 
             {
-                RxSchedulers.MainThreadScheduler.Schedule(() => 
+                RxSchedulers.MainThreadScheduler.Schedule(async () => 
                 {
-                    _ = Reload(); 
+                    // 1. دستور تست پینگ از تمام سرورها در پس‌زمینه
+                    AppEvents.TestServerRequested.Publish();
+                    
+                    // 2. انتظار برای کامل شدن تست‌ها
+                    await Task.Delay(4000);
+                    
+                    // 3. ری‌استارت هسته برای اتصال تازه به سرورهای پینگ‌شده
+                    await Reload(); 
                 });
             });
         }
@@ -559,6 +595,7 @@ public class MainWindowViewModel : MyReactiveObject
 
     public async Task Reload()
     {
+        //If there are unfinished reload job, marked with next job.
         if (!await _reloadSemaphore.WaitAsync(0))
         {
             _hasNextReloadJob = true;
@@ -601,6 +638,7 @@ public class MainWindowViewModel : MyReactiveObject
         {
             SetReloadEnabled(true);
             _reloadSemaphore.Release();
+            //If there is a next reload job, execute it.
             if (_hasNextReloadJob)
             {
                 _hasNextReloadJob = false;
