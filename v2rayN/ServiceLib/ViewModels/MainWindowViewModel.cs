@@ -6,7 +6,7 @@ using System.Reactive.Concurrency;
 namespace ServiceLib.ViewModels;
 
 // =========================================================================
-// کلاس مدیریت تست خودکار (به داخل این فایل منتقل شد تا ارور بیلد برطرف شود)
+// کلاس مدیریت تست خودکار
 // =========================================================================
 public class AutoTestManager
 {
@@ -98,7 +98,7 @@ public class MainWindowViewModel : MyReactiveObject
     [Reactive] public bool BlIsWindows { get; set; }
 
     // ============================================
-    // اضافه شدن دکمه تست خودکار 
+    // اضافه شدن متغیر مدیریت دکمه
     // ============================================
     private bool _isAutoTestEnabled;
     public bool IsAutoTestEnabled
