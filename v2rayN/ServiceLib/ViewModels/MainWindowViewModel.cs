@@ -1,4 +1,8 @@
 using System.Reactive.Concurrency;
+using ServiceLib.Services;
+using Avalonia.Threading;
+using System.Threading.Tasks;
+using System;
 
 namespace ServiceLib.ViewModels;
 
@@ -64,6 +68,28 @@ public class MainWindowViewModel : MyReactiveObject
     public int TabMainSelectedIndex { get; set; }
 
     [Reactive] public bool BlIsWindows { get; set; }
+
+    // ============================================
+    // اضافه شدن دکمه تست خودکار 
+    // ============================================
+    private bool _isAutoTestEnabled;
+    public bool IsAutoTestEnabled
+    {
+        get => _isAutoTestEnabled;
+        set 
+        {
+            this.RaiseAndSetIfChanged(ref _isAutoTestEnabled, value);
+            
+            AutoTestManager.Instance.ToggleAutoTest(value, () => 
+            {
+                Avalonia.Threading.Dispatcher.UIThread.Post(() => 
+                {
+                    _ = Reload(); 
+                });
+            });
+        }
+    }
+    // ============================================
 
     #endregion Menu
 
@@ -534,7 +560,6 @@ public class MainWindowViewModel : MyReactiveObject
 
     public async Task Reload()
     {
-        //If there are unfinished reload job, marked with next job.
         if (!await _reloadSemaphore.WaitAsync(0))
         {
             _hasNextReloadJob = true;
@@ -577,7 +602,6 @@ public class MainWindowViewModel : MyReactiveObject
         {
             SetReloadEnabled(true);
             _reloadSemaphore.Release();
-            //If there is a next reload job, execute it.
             if (_hasNextReloadJob)
             {
                 _hasNextReloadJob = false;
