@@ -96,6 +96,10 @@
                         <Separator />
                     </MenuItem>
 
+                    <MenuItem Header="🚀 اتصال هوشمند" 
+                              ToggleType="CheckBox" 
+                              IsChecked="{Binding IsAutoTestEnabled}"
+                              ToolTip.Tip="تست خودکار و اتصال به بهترین سرور هر ۶۰ ثانیه" />
                     <MenuItem x:Name="menuReload" Header="{x:Static resx:ResUI.menuReload}" />
 
                     <MenuItem x:Name="menuPromotion" Header="{x:Static resx:ResUI.menuPromotion}" />
